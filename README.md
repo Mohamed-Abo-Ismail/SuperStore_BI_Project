@@ -1,11 +1,6 @@
 # Super Store Sales Performance Analysis
 
 An end-to-end Business Intelligence solution built with Power BI, covering data cleaning, star schema modeling, DAX measures, and a four-page interactive dashboard with custom Figma-designed dark-theme backgrounds.
-
-Course: DS302 - Data Science Methodology
-University: Pharos University, Faculty of Computer Science and Artificial Intelligence
-Term: Spring 2025-2026
-
 ---
 
 ## Overview
