@@ -1,85 +1,45 @@
 # Super Store Sales Performance Analysis
 
-An end-to-end Business Intelligence solution built with Power BI, covering data cleaning, star schema modeling, DAX measures, and a four-page interactive dashboard with custom Figma-designed dark-theme backgrounds.
+An end-to-end Power BI project for a fictional US retail company: data cleaning, star schema modeling, DAX measures, and a four-page interactive dashboard with Figma-designed backgrounds.
+
 ---
 
 ## Overview
 
-This project delivers a complete BI workflow for a fictional US retail company, Superstore, from raw CSV ingestion to a published, interactive dashboard.
+Management lacks a centralized, visual way to monitor sales performance, customer behavior, product profitability, and regional trends. This project delivers a Power BI dashboard that covers those needs, from raw CSV to published report.
 
-**Objectives**
+## Key Findings
 
-- Build a fully functional, interactive Power BI dashboard for a retail sales organization
-- Clean and transform data with Power Query
-- Implement a star schema with proper Many-to-One relationships
-- Create 13 DAX measures covering revenue, profit, growth, and time intelligence
-- Design four analytical report pages plus a home screen with Figma-designed backgrounds
-
-## Business Problem
-
-Management lacks a centralized, visual way to monitor sales performance, customer behavior, product profitability, and regional trends across three product categories: Technology, Furniture, and Office Supplies. This dashboard addresses those needs through interactive, filterable reports.
+- Total revenue is about $1.10M, with 48.11% year-over-year growth in the final year
+- Total profit is $132.52K, a 12.05% profit margin
+- Consumer is the largest segment at 50.76% of revenue
+- 81.37% of orders are profitable, 18.07% lose money, and 0.56% break even
+- Tables and Bookcases are loss-making sub-categories, and higher discounts are linked to lower profit
+- East has the highest profit and Central the lowest margin
+- Top customer: Adrian Barton (about $12.12K); average order value: $219.58
 
 ## Dataset
 
-| Property | Details |
-|---|---|
-| Source | Kaggle Superstore Sales Dataset (by Vivek Chowdhury) |
-| File | Sample - Superstore.csv |
-| Rows | 9,994 transactions |
-| Columns | 21 (plus an added Profit Status column) |
-| Date range | 2014 - 2017 |
-| Geography | United States: 4 regions, 49 states |
-| Categories | Technology, Furniture, Office Supplies |
+Kaggle Superstore Sales Dataset (Sample - Superstore.csv): 9,994 transactions, 21 columns, 2014-2017, across 4 US regions and 49 states. Categories: Technology, Furniture, Office Supplies.
 
-## Tech Stack
+## Tools
 
-| Area | Tool |
-|---|---|
-| Data transformation | Power Query (M) |
-| Data modeling | Power BI, star schema |
-| Calculations | DAX |
-| Visualization | Power BI |
-| UI / background design | Figma |
-| Publishing | Power BI Service |
+Power BI, Power Query, DAX, Figma, Power BI Service
 
 ## Data Cleaning (Power Query)
 
-Six transformation steps were applied before modeling:
+1. Removed duplicates using Order ID
+2. Replaced nulls in Revenue and Profit with 0
+3. Enforced correct data types
+4. Added a Profit Status column (Profitable, Break-Even, Loss)
+5. Removed rows with a null Order ID
+6. Renamed columns (Sales to Revenue, Cust ID to CustomerID)
 
-| # | Step | Purpose |
-|---|---|---|
-| 1 | Remove duplicates (key: Order ID) | Prevent double-counting |
-| 2 | Replace nulls in Revenue and Profit with 0 | Avoid errors in DAX aggregations |
-| 3 | Enforce data types | Dates as Date, financials as Decimal, Quantity as Whole Number, IDs as Text |
-| 4 | Add Profit Status column | Classify each row as Profitable, Break-Even, or Loss |
-| 5 | Filter test rows | Remove rows where Order ID is null |
-| 6 | Rename columns | Sales to Revenue, Cust ID to CustomerID |
+## Data Model
 
-## Data Model (Star Schema)
-
-One fact table connected to four dimension tables through Many-to-One relationships.
-
-```
-                 DimProduct              DimRegion
-                      \                    /
-                       \                  /
-                        +---- Fact ------+
-                       /                  \
-                      /                    \
-                DimCustomer              DimDate
-```
-
-| Table | Type | Key Fields |
-|---|---|---|
-| Fact | Fact | OrderID, CustomerID, ProductID, OrderDate, Region, Revenue, Profit, Quantity, Discount, ProfitStatus |
-| DimCustomer | Dimension | CustomerID, CustomerName, Segment |
-| DimProduct | Dimension | ProductID, ProductName, Category, SubCategory |
-| DimDate | Dimension | OrderDate, Year, Month, MonthName, Quarter |
-| DimRegion | Dimension | Region |
+Star schema with one fact table (Fact) and four dimension tables (DimCustomer, DimProduct, DimDate, DimRegion), connected by Many-to-One relationships.
 
 ## DAX Measures
-
-**Basic aggregations**
 
 | Measure | Formula |
 |---|---|
@@ -88,20 +48,10 @@ One fact table connected to four dimension tables through Many-to-One relationsh
 | Total Quantity | `SUM(Fact[Quantity])` |
 | Total Orders | `DISTINCTCOUNT(Fact[OrderID])` |
 | Total Discount | `SUM(Fact[Discount])` |
-
-**Customer and financial intelligence**
-
-| Measure | Formula |
-|---|---|
 | Average Order Value | `DIVIDE([Total Revenue], [Total Orders])` |
 | Profit Margin % | `DIVIDE([Total Profit], [Total Revenue]) * 100` |
 | Top Customer Revenue | `MAXX(VALUES(DimCustomer[Customer Name]), [Total Revenue])` |
 | Bottom Customer Revenue | `MINX(VALUES(DimCustomer[Customer Name]), [Total Revenue])` |
-
-**Time intelligence**
-
-| Measure | Formula |
-|---|---|
 | YTD Revenue | `TOTALYTD([Total Revenue], DimDate[OrderDate])` |
 | YTD Profit | `TOTALYTD([Total Profit], DimDate[OrderDate])` |
 | Previous Year Revenue | `CALCULATE([Total Revenue], SAMEPERIODLASTYEAR(DimDate[OrderDate]))` |
@@ -109,50 +59,12 @@ One fact table connected to four dimension tables through Many-to-One relationsh
 
 ## Dashboard Pages
 
-The report contains a Home Screen and four analytical pages, each with left-panel slicers for interactivity.
+| Page | Focus |
+|---|---|
+| Home Screen | Title, team, and navigation button |
+| Revenue Overview | Revenue by year, category, and segment; monthly YTD revenue |
+| Customer Analysis | Top 10 customers, segments, orders by profit status |
+| Product Performance | Profit by sub-category, profit vs. discount, revenue vs. profit |
+| Regional Analysis | Revenue by state, regional profit and revenue, YTD trends |
 
-| Page | Theme | Focus | Key Visuals |
-|---|---|---|---|
-| 1. Revenue Overview | Blue | Overall sales performance | KPI cards, revenue over years, revenue by category, monthly YTD revenue, revenue by segment |
-| 2. Customer Analysis | Purple | Customer behavior and segments | Top/bottom customer revenue, Top 10 customers, orders by segment, orders by profit status |
-| 3. Product Performance | Red | Profitability by category and sub-category | Profit by sub-category, profit vs. discount scatter, revenue vs. profit by category |
-| 4. Regional Analysis | Orange | Geographic and time-based trends | Filled map by state, profit/revenue by region, YTD revenue by region |
-
-## Design Process
-
-The dashboard was built in two stages:
-
-1. Functional layer: a light-themed version was built directly in Power BI to validate visuals, fields, and DAX measures.
-2. Visual layer: once the data was verified, dark-themed page backgrounds were designed in Figma and imported as images behind the visuals.
-
-## Key Findings
-
-**Revenue**
-
-- Total revenue for 2014-2017 reached about $1.10M, with 48.11% year-over-year growth in the final year
-- The Consumer segment generates the largest share of revenue (50.76%), followed by Corporate (31.15%) and Home Office (18.09%)
-
-**Profitability**
-
-- Total profit is $132.52K, a profit margin of 12.05%
-- 81.37% of orders are profitable, 18.07% result in a loss, and 0.56% break even
-- Sub-categories such as Tables and Bookcases show negative profit
-- Higher discount rates are associated with lower or negative profit
-
-**Regions**
-
-- East generates the highest total profit, followed by West
-- Central shows the lowest profit margin
-- YTD revenue grows consistently across all four regions
-
-**Customers**
-
-- Top customer: Adrian Barton (about $12.12K in revenue)
-- Average order value: $219.58
-
-## Project Deliverables
-
-- Power BI report (.pbix) with a home screen and four analytical pages
-- Report published on Power BI Service
-- Figma design files for the dashboard backgrounds
-- Full project documentation report (PDF)
+Each page has slicers for Year, Region, and Category (or Segment).
